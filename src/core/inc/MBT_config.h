@@ -10,7 +10,7 @@
 #define MQTT_OUT_CACHE_MAX          (50)
 #define MQTT_OUT_THREAD_PRIORITY    (20)
 
-
+#define REALTIME_SERVER_DEFAULT     "tcp://tqauto.asuscomm.com:1884"
 
 #define DEV_PROVISION_API  "/api/v1/provision"
 
@@ -36,9 +36,13 @@
 #define MODBUS_CORE_THREAD_PRIORITY    (23)
 
 //db
-#define ATTRIBUTE_KEY_PREFIX  "MBT_ATTRI"
-#define MBT_DB_FILE_PATH        "/opt/MBT/simple.db"
+#define ATTRIBUTE_KEY_PREFIX        "MBT_ATTRI"
+#define MBT_DB_FILE_PATH            "/opt/MBT/simple.db"
+#define MBT_DB_FILE_PATH_LENGTH_MAX (512)
 
-
+//bulk service
+#define BULK_SAVE_FILE_PREFIX   	"mbt"
+#define BULK_SAVE_FILE_SUFFIX   	"dat"
+#define BULK_UPLOADED_FILE_SUFFIX	"bk"
 
 #endif

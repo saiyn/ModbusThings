@@ -3,12 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "modbus_system.h"
-#include "modbus_config.h"
-#include "portHttpClient.h"
+#include "MBT_config.h"
+#include "MBT_portHttpClient.h"
 
 
-#include "modbus_attributes.h"
+#include "MBT_attributes.h"
 
 #include "modbus_network.h"
 
@@ -58,7 +57,7 @@ static int do_dev_provisioning(struct mdb_network *mdbn, char **token, char *ser
 	char *uuid = DEFAULT_DEV_UUID;
 	
 	//need to log out error to warn caller set uuid first
-	int rc = mba_load_attribute(ATTRI_DEV_UUID, &uuid);
+	int rc = mba_load_attribute(ATTRI_DEV_UUID, &uuid, DEFAULT_DEV_UUID);
 	//if(rc < 0)
 		//return rc;
 	
@@ -77,10 +76,10 @@ int modbus_attributes_init(struct mdb_network *mdbn)
 	service_db_init(ATTRI_KEY_NUM);
 	
 	
-	int rc =  mba_load_attribute(ATTRI_DEV_TOKEN, &token);
+	int rc =  mba_load_attribute(ATTRI_DEV_TOKEN, &token, NULL);
 	if(rc == 0){			
 		
-			rc = mba_load_attribute(ATTRI_DEV_CONFIG, &config);
+			rc = mba_load_attribute(ATTRI_DEV_CONFIG, &config, NULL);
 			if(rc == 0){
 				
 				rc = mba_attribute_check_expire(ATTRI_DEV_CONFIG_TS);
@@ -102,7 +101,7 @@ int modbus_attributes_init(struct mdb_network *mdbn)
 		//because, without token means we have no config, without config, we can't do anything
 		char *server_uri = DEFAULT_SERVER_FQDN;
 		
-		rc = mba_load_attribute(ATTRI_SERVER_URI, &server_uri);
+		rc = mba_load_attribute(ATTRI_SERVER_URI, &server_uri, DEFAULT_SERVER_FQDN);
 
 		
 		rc = do_dev_provisioning(mdbn, &token, server_uri);
@@ -128,7 +127,7 @@ int modbus_attributes_init(struct mdb_network *mdbn)
 		
 		char *server_uri = DEFAULT_SERVER_FQDN;
 		
-		rc = mba_load_attribute(ATTRI_SERVER_URI, &server_uri);
+		rc = mba_load_attribute(ATTRI_SERVER_URI, &server_uri, DEFAULT_SERVER_FQDN);
 		
 		
 		check_config_update(token ,config, server_uri);
@@ -143,7 +142,7 @@ int modbus_attributes_init(struct mdb_network *mdbn)
 
 
 
-int mba_load_attribute(attri_key_e key ,char **attri)
+int mba_load_attribute(attri_key_e key ,char **attri, char *dft)
 {
 	int rc = 0;
 	
@@ -160,8 +159,13 @@ int mba_load_attribute(attri_key_e key ,char **attri)
 			
 			*attri = value;
 		}else{
-			
-			rc = -1;
+
+			if(dft){
+				_as.cache[key] = dft;
+				*attri = dft;
+			}else{	
+				rc = -1;
+			}
 		}	
 		
 	}

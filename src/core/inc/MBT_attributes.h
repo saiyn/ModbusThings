@@ -20,6 +20,8 @@ typedef enum attri_key{
 	
 	
 	ATTRI_BULK_INDEX,
+	ATTRI_BULK_FILE_TAIL_INDEX,
+	ATTRI_BILK_FILE_TAIL_DATE,
 	ATTRI_BULK_FORMAT_VERSION,
 	
 	
@@ -27,6 +29,7 @@ typedef enum attri_key{
 	
 	ATTRI_SERVER_URI,
 	ATTRI_BULK_SERVICE_URI,
+	ATTRI_REALTIME_URI,
 	
 	ATTRI_KEY_NUM
 	
@@ -54,7 +57,7 @@ int modbus_attributes_init(struct mdb_network *);
 
 
 //should have cache internally
-int mba_load_attribute(attri_key_e key ,char **attri);
+int mba_load_attribute(attri_key_e key ,char **attri, char*);
 
 
 int mba_load_attribute_int(attri_key_e key ,int *attri);

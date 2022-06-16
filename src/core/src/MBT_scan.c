@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "cJSON.h"
-#include "modbus_scan.h"
+#include "MBT_scan.h"
 #include <stdlib.h>
 #include <string.h>
 #include "MBT_portMaster.h"
-#include "modbus_system.h"
+
 
 #define MB_TYPE_COILS 				"coils"
 #define MB_TYPE_DISCRET_INPUT "discret_input"
@@ -112,14 +112,19 @@ int mds_parse_scan(char *json, convert c, mds_scan_t *result)
 	
 	
 	cJSON *root = cJSON_Parse(json);
+	if(!root){
+		return -1;
+	}
 
 	cJSON *shared = cJSON_GetObjectItem(root, "shared");
 	if(!shared){
+		cJSON_Delete(root);
 		return -1;
 	}
 	
 	cJSON *mb_config = cJSON_GetObjectItem(shared, "mb_config");
 	if(!mb_config){
+		cJSON_Delete(root);
 		return -1;
 	}
 	
@@ -139,6 +144,8 @@ int mds_parse_scan(char *json, convert c, mds_scan_t *result)
 			}
 
 	}
+
+	cJSON_Delete(root);
 
 	return 0;
 }
@@ -229,7 +236,7 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 	if(ty_str == NULL)
 	{
 		
-		m_free(res_merge);
+		cJSON_Delete(res_merge);
 		
 		return -1;
 	}
@@ -239,7 +246,7 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 	cJSON *item = cJSON_CreateObject();
 	if(item == NULL)
 	{
-		m_free(res_merge);
+		cJSON_Delete(res_merge);
 		
 		return -1;
 	}
@@ -291,7 +298,7 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 		*result = cJSON_PrintUnformatted(res_merge);
 	
 	
-	m_free(res_merge);
+	cJSON_Delete(res_merge);
 	
 	
 	return 0;

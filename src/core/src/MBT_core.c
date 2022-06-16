@@ -3,19 +3,18 @@
 #include <time.h>
 
 
-#include "modbus_config.h"
+#include "MBT_config.h"
 
 #include "modbus_attributes.h"
 
-#include "modbus_bulk.h"
+#include "MBT_bulk.h"
 
 #include "modbus_realtime.h"
 
-#include "modbus_scan.h"
+#include "MBT_scan.h"
 
 #include "modbus_network.h"
 
-#include "modbus_system.h"
 
 #include "cJSON.h"
 
@@ -69,9 +68,9 @@ static int mdc_attribute_update(mda_core_t *mdc)
 	modbus_attributes_init(mdc->md_net_service);
 	
 	//this load should get result from cache
-	mba_load_attribute(ATTRI_DEV_TOKEN, &mdc->token);
+	mba_load_attribute(ATTRI_DEV_TOKEN, &mdc->token, NULL);
 	
-	mba_load_attribute(ATTRI_DEV_CONFIG, &mdc->config);
+	mba_load_attribute(ATTRI_DEV_CONFIG, &mdc->config, NULL);
 
 	mdc->config_update = 1;
 	
@@ -84,8 +83,8 @@ static int mdc_realtime_setup(mda_core_t *mdc)
 	char *server_uri = NULL;
 	char *uuid = NULL;
 	
-	mba_load_attribute(ATTRI_SERVER_URI, &server_uri);
-	mba_load_attribute(ATTRI_DEV_UUID, &uuid);
+	mba_load_attribute(ATTRI_SERVER_URI, &server_uri, REALTIME_SERVER_DEFAULT);
+	mba_load_attribute(ATTRI_DEV_UUID, &uuid, DEFAULT_DEV_UUID);
 	
 	mdr_service_t * mdrs = modbus_realtime_init(mdc->token, uuid, server_uri);
 	
@@ -123,21 +122,26 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 		return;
 	}
 	
+	int rc = 0;
 	char *file_path = NULL;
 	char *bulk_server_uri = DEFAULT_SERVER_FQDN"/"DEFAULT_BULK_SERVICE_API;
 	
 	
-	mba_load_attribute(ATTRI_BULK_SERVICE_URI, &bulk_server_uri);
+	mba_load_attribute(ATTRI_BULK_SERVICE_URI, &bulk_server_uri, DEFAULT_SERVER_FQDN"/"DEFAULT_BULK_SERVICE_API);
 	
 	switch(reason){
 		//maybe the 485 bus is not connected, so we can check for upload bluk data cached in last working time
 		//maybe the 485 bus error for a time, so we do a bluk check and upload to give the 485 bus time to resume
 		case CHECK_REASON_SCAN_FAIL:
 		{
-			//try to upload the very first cache data
-			file_path = mdc->md_bulk_service->get_head_cache_file_path(mdc->md_bulk_service);
-			if(file_path)
-				mdc->md_bulk_service->post_bluk_data_by_file(mdc->md_bulk_service, bulk_server_uri, file_path);
+			//try to upload the very old cache data
+			file_path = mdc->md_bulk_service->get_tail_cache_file_path(mdc->md_bulk_service);
+			if(file_path){
+				rc = mdc->md_bulk_service->post_bluk_data_by_file(mdc->md_bulk_service, bulk_server_uri, file_path);
+				
+				//judge whether we need to retry according to the return code
+				check_post_status(mdc, CHECK_REASON_SCAN_FAIL, rc);
+			}
 		
 			break;
 		}
@@ -147,10 +151,15 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 		//if the network fully lost cause the full, then we can't do bluk update neither
 		case CHECK_REASON_CACHE_FULL:
 		{
-			//try to upload the very last cache data
-			file_path = mdc->md_bulk_service->get_tail_cache_file_path(mdc->md_bulk_service);
-			if(file_path)
-				mdc->md_bulk_service->post_bluk_data_by_file(mdc->md_bulk_service, bulk_server_uri, file_path);	
+			//try to upload the very latest cache data
+			file_path = mdc->md_bulk_service->get_head_cache_file_path(mdc->md_bulk_service);
+			if(file_path){
+				rc = mdc->md_bulk_service->post_bluk_data_by_file(mdc->md_bulk_service, bulk_server_uri, file_path);	
+				
+				//update index info according return status
+				check_post_status(mdc, CHECK_REASON_CACHE_FULL, rc);
+				
+			}
 		
 			break;
 		}

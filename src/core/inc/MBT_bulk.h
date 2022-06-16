@@ -32,8 +32,12 @@ typedef struct mdb_bluk{
 	int (*save_bulk_data)(struct mdb_bluk *);
 	
 	
-	
 	int (*post_bluk_data_by_file)(struct mdb_bluk *, char *uri, char *file_name);
+
+	int (*update_tail_index)(struct mdb_bluk *);
+	
+	
+	int (*update_head_index)(struct mdb_bluk *);
 	
 	
 }mdb_bluk_t;
