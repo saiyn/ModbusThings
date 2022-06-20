@@ -28,6 +28,7 @@
 enum{
 	CHECK_REASON_SCAN_FAIL = 0,
 	CHECK_REASON_CACHE_FULL,
+	CHECK_REASON_CONFIG_ERROR,
 	
 };
 
@@ -133,6 +134,7 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 		//maybe the 485 bus is not connected, so we can check for upload bluk data cached in last working time
 		//maybe the 485 bus error for a time, so we do a bluk check and upload to give the 485 bus time to resume
 		case CHECK_REASON_SCAN_FAIL:
+		case CHECK_REASON_CONFIG_ERROR:
 		{
 			//try to upload the very old cache data
 			file_path = mdc->md_bulk_service->get_tail_cache_file_path(mdc->md_bulk_service);
@@ -183,10 +185,20 @@ static void mdc_loop(void *arg)
 		
 	
 		if(mdc->config_update){
-			
-				mds_parse_scan(mdc->config, (void *)0, mdc->md_scan_service);
-			
 				mdc->config_update = 0;
+				
+				mds_parse_scan(mdc->config, (void *)0, mdc->md_scan_service);
+				if(rc < 0){
+					LOG_E("parse scan config fail, pause scan but try to do bulk service");
+					
+					rc = check_do_bulk_service(mdc, CHECK_REASON_CONFIG_ERROR);
+					
+					if(rc < 0){
+						m_sleep(3);
+					}
+				}
+			
+				
 		}
 		
 		
@@ -274,8 +286,13 @@ static void realtime_msg_received(char *msg)
 			
 			LOG_I("recv attribute mb_config update");
 			
-			return;
+		}else{
+			
+			LOG_W("unknown msg:%s", cJSON_PrintUnformatted(root));
 		}
+	
+
+		cJSON_Delete(root);
 	
 }
 
