@@ -80,6 +80,7 @@ static int parse_input_reg_config(cJSON *conf, mds_scan_t* re)
 		node->size = (node->reg.input.offset - node->reg.input.start) * sizeof(unsigned short);
 		node->value = (unsigned short *)malloc(node->size);
 		
+		snprintf(node->alias_name, sizeof(node->alias_name), "%d:%s", ad->valueint, la->valuestring);
 		
 		if(re->head == NULL){
 			re->head = node;
@@ -178,6 +179,8 @@ int mds_scan(mds_scan_t *scan)
 					retval = scan->ops.read_input_regs(scan->userdata, node->reg.input.dev_addr, node->size / 2, node->value);
 			
 					node->stat = retval < 0 ? MB_SCAN_FAIL : MB_SCAN_SUCCESS;
+
+					LOG_I("[%s] scan %s", node->alias_name, node->stat == MB_SCAN_SUCCESS ? "success" : "fail");
 				break;
 			
 			default:

@@ -1,7 +1,7 @@
 #ifndef _MODBUS_APP_H_
 #define _MODBUS_APP_H_
 
-
+#define SCAN_NODE_ALIAS_NAME_MAX   (32)
 
 typedef enum mb_type{
 	MB_TYPE_COILS_E = 0,
@@ -54,7 +54,7 @@ typedef struct mds_item{
 	
 	
 	scan_stat_e stat;
-	
+	char alias_name[SCAN_NODE_ALIAS_NAME_MAX];
 	struct mds_item * next;
 	struct mds_item * prev;
 	
@@ -94,11 +94,7 @@ int mds_merge_result(mds_scan_t *scan, char **result);
 
 
 
-//port interface
-void *modbus_master_init(void);
 
-
-int modbus_master_read_input_regs(void *ctx ,int addr, int nb, unsigned short *dest);
 
 
 

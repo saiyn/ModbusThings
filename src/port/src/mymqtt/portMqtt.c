@@ -1,6 +1,7 @@
 #include "modbus_realtime.h"
 #include "mqtt_client.h"
 
+#include <string.h>
 
 #define DBG_TAG              "portMqtt"
 #define DBG_LVL              DBG_LOG
@@ -100,6 +101,7 @@ static void mqtt_app_thread(void *arg)
 	rt_err_t result;
 	mqtt_client *mqtt = (mqtt_client *)arg;
 	
+	int rc = 0;
 	telemetry_t msg;
 	
 	for(;;)
@@ -108,9 +110,13 @@ static void mqtt_app_thread(void *arg)
 		result = rt_mq_recv(&mqtt_mq, &msg, sizeof(msg), RT_WAITING_FOREVER);
 		if(result == RT_EOK){
 			
-			paho_mqtt_publish(mqtt, QOS1, msg.topic , msg.msg, rt_strlen(msg.msg));
+			rc = paho_mqtt_publish(mqtt, QOS1, msg.topic , msg.msg, rt_strlen(msg.msg));
 			
 			rt_free(msg.msg);
+			
+			if(rc == 0){
+				LOG_I("publish one msg success");
+			}
 			
 		}
 		
@@ -207,6 +213,14 @@ int mqtt_push_data(void *userdata, telemetry_t *tt, char *topic)
 	return 0;
 }
 
+static int do_dump(void *dst, void * src)
+{
+	telemetry_t *msg = (telemetry_t *)src;
+	
+	strcpy(dst, msg->msg);
+	
+	return strlen(msg->msg);
+}
 
 
 int mqtt_dump_cached_data(void *userdata, char *buf, int off, int limit)
@@ -214,7 +228,7 @@ int mqtt_dump_cached_data(void *userdata, char *buf, int off, int limit)
 	mqtt_client *mqtt = (mqtt_client *)userdata;
 	
 	
-	return rt_mq_dump_limit(&mqtt_mq, buf, off, limit);
+	return rt_mq_dump_limit(&mqtt_mq, buf, off, limit, do_dump);
 
 }
 
