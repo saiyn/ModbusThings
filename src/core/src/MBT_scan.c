@@ -100,6 +100,13 @@ static int parse_hold_reg_config(cJSON *conf, mds_scan_t* re)
 	return 0;
 }
 
+static void clear_all_scan_node(mds_scan_t *s)
+{
+	
+	
+	
+}
+
 
 int mds_parse_scan(char *json, convert c, mds_scan_t *result)
 {
@@ -110,6 +117,7 @@ int mds_parse_scan(char *json, convert c, mds_scan_t *result)
 	
 	char *data_type[] = {MB_TYPE_COILS, MB_TYPE_DISCRET_INPUT, MB_TYPE_INPUT_REG, MB_TYPE_HOLD_REG};
 	
+	cJSON *mb_config = NULL;
 	
 	cJSON *root = cJSON_Parse(json);
 	if(!root){
@@ -118,16 +126,23 @@ int mds_parse_scan(char *json, convert c, mds_scan_t *result)
 
 	cJSON *shared = cJSON_GetObjectItem(root, "shared");
 	if(!shared){
-		cJSON_Delete(root);
-		return -1;
+		mb_config = cJSON_GetObjectItem(root, "mb_config");
+		if(!mb_config){
+			cJSON_Delete(root);
+			return -1;
+		}
+	}else{
+
+		mb_config = cJSON_GetObjectItem(shared, "mb_config");
+		if(!mb_config){
+			cJSON_Delete(root);
+			return -1;
+		}
 	}
 	
-	cJSON *mb_config = cJSON_GetObjectItem(shared, "mb_config");
-	if(!mb_config){
-		cJSON_Delete(root);
-		return -1;
-	}
-	
+	//here we should remove all exist scan node
+	clear_all_scan_node(result);
+
 	for(int i = 0; i < sizeof(data_type) / sizeof(data_type[0]); i++){
 		
 			cJSON *dt = cJSON_GetObjectItem(mb_config, data_type[i]);
@@ -153,7 +168,7 @@ int mds_parse_scan(char *json, convert c, mds_scan_t *result)
 int mds_scan(mds_scan_t *scan)
 {
 	int retval = 0;
-	
+	int anyOneOk = 0;
 	
 	for(mds_item_t *node = scan->head; node != NULL; node = node->next){
 		
@@ -169,11 +184,14 @@ int mds_scan(mds_scan_t *scan)
 				break;
 			
 		}
+
+		if(node->stat == MB_SCAN_SUCCESS)
+			anyOneOk = 1;
 		
-		m_usleep(5000);
+		m_usleep(500000);
 	}
 	
-	return 0;
+	return !anyOneOk;
 }
 
 
