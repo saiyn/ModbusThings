@@ -1,7 +1,8 @@
-#include <rtthread.h>
-#include <dfs_posix.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "MBT_osFs.h"
+
 
 int m_open(const char *pathname, int flags)
 {
