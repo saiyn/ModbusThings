@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #include "MBT_bulk.h"
-
-#include "modbus_attributes.h"
+#include "MBT_osFs.h"
+#include "MBT_attributes.h"
 
 
 #define DBG_TAG              "mdbb"
@@ -171,7 +171,9 @@ static int update_head_index(struct mdb_bluk *mdbb)
 
 static int post_bluk_data_by_file(struct mdb_bluk *mdbb, char *uri, char *file_name)
 {
-	
+	if(m_access(file_name, R_OK) != 0){
+		return -1;
+	}
 
 
 	

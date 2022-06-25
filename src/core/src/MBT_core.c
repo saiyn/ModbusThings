@@ -191,11 +191,11 @@ static void mdc_loop(void *arg)
 				if(rc < 0){
 					LOG_E("parse scan config fail, try to do bulk service");
 					
-					rc = check_do_bulk_service(mdc, CHECK_REASON_CONFIG_ERROR);
-					
-					if(rc < 0){
+					if(check_do_bulk_service(mdc, CHECK_REASON_CONFIG_ERROR) < 0){
 						m_sleep(3);
 					}
+					
+				
 				}
 		}
 		
@@ -206,7 +206,9 @@ static void mdc_loop(void *arg)
 		 
 		if(rc < 0){
 			
-			check_do_bulk_service(mdc, CHECK_REASON_SCAN_FAIL);
+			if(check_do_bulk_service(mdc, CHECK_REASON_SCAN_FAIL)  < 0){
+				m_sleep(1);
+			}
 			
 			continue;
 		}
@@ -228,7 +230,7 @@ static void mdc_loop(void *arg)
 		
 		rc = mdc->mdrs->push_data(mdc->mdrs->userdata ,tt, mdc->mdrs->telemetry_topic);
 		
-		if(rc == REALTIME_ERR_QUEUE_FULL){
+		if(rc == -REALTIME_ERR_QUEUE_FULL){
 			
 			mdc->mdrs->dump_cached_data(mdc->mdrs->userdata, mdc->md_bulk_service);
 			

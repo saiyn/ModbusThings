@@ -37,6 +37,11 @@ int m_rename(const char *oldpath, const char *newpath)
 }
 
 
+int m_access(const char *pathname, int mode)
+{
+	return access(pathname, mode);
+}
+
 int m_close(int fd)
 {
 	return close(fd);

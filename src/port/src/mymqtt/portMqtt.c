@@ -10,6 +10,8 @@
 struct rt_messagequeue mqtt_mq;
 static char _msg_pool[512];
 
+static int volatile _connected = 0;
+
 void * mqtt_client_init(char *token, char *cid, char *uri)
 {
 	
@@ -63,11 +65,16 @@ static void mqtt_connect_callback(mqtt_client *c)
 static void mqtt_online_callback(mqtt_client *c)
 {
 	c->stat_ops.onConnected();
+
+	_connected = 1;
 }
 
 static void mqtt_offline_callback(mqtt_client *c)
 {
 	c->stat_ops.onDisconnected();
+
+
+	_connected = 0;
 }
 
 
@@ -106,6 +113,13 @@ static void mqtt_app_thread(void *arg)
 	
 	for(;;)
 	{
+
+		if(!_connected){
+
+			m_sleep(3);
+
+			continue;
+		}
 
 		result = rt_mq_recv(&mqtt_mq, &msg, sizeof(msg), RT_WAITING_FOREVER);
 		if(result == RT_EOK){
@@ -217,9 +231,13 @@ static int do_dump(void *dst, void * src)
 {
 	telemetry_t *msg = (telemetry_t *)src;
 	
-	strcpy(dst, msg->msg);
+	sprintf(dst, "%s\n",msg->msg);
 	
-	return strlen(msg->msg);
+	int len = strlen(msg->msg) + 1;
+
+	m_free(msg->msg);
+	
+	return len;
 }
 
 

@@ -202,20 +202,6 @@ int mds_scan(mds_scan_t *scan)
 //{
 //  "type": "rawData",
 //  "rawData": {
-//    "EngineL.input":  "00d800d8",
-//    "EngineL.hold": "00d800d8",
-//    "EngineR.input": "00dd00dd",
-//    "EngineR.hold": "00dd00dd"
-//    "UltraFlow.hold": "dd00dd00"
-//  },
-//  "ts": 6883838383
-//}
-
-
-
-//{
-//  "type": "rawData",
-//  "rawData": {
 //    "input.engineL":  "00d800d8",
 //    "hold.engineL": "00d800d8",
 //		"hold.engineL.event": 88,
@@ -225,6 +211,23 @@ int mds_scan(mds_scan_t *scan)
 //    "hold.UltraFlow": "dd00dd00"
 //  },
 //  "ts": 6883838383
+//}
+
+
+//{
+//	"values": {
+//		"type": "rawData",
+//		"rawData": {
+//			"input.engineL": "00d800d8",
+//			"hold.engineL": "00d800d8",
+//			"hold.engineL.event": 88,
+//			"input.engineR": "00dd00dd",
+//			"hold.engineR": "00dd00dd",
+//			"hold.engineR.sn": "xxxxx",
+//			"hold.UltraFlow": "dd00dd00"
+//		}
+//	},
+//	"ts": 6883838383
 //}
 
 
@@ -252,6 +255,12 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 	{
 		return -1;
 	}
+
+	cJSON *values = cJSON_CreateObject();
+	if(res_merge == NULL)
+	{
+		return -1;
+	}
 	
 	cJSON *ty_str = cJSON_CreateString("rawData");
 	if(ty_str == NULL)
@@ -262,7 +271,7 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 		return -1;
 	}
 	
-	cJSON_AddItemToObject(res_merge, "type", ty_str);
+	cJSON_AddItemToObject(values, "type", ty_str);
 	
 	cJSON *item = cJSON_CreateObject();
 	if(item == NULL)
@@ -304,7 +313,9 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 	
 	}
 	
-	cJSON_AddItemToObject(res_merge, "rawData", item);
+	cJSON_AddItemToObject(values, "rawData", item);
+
+	cJSON_AddItemToObject(res_merge, "values", values);
 	
 	//add timestamp info
 	time_t now = m_time(NULL);

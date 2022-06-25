@@ -126,6 +126,10 @@ static int do_dump(void *msg, char *buf, size_t size)
 
     memcpy(buf, tt->msg, tt->size);
 
+    m_free(tt->msg);
+
+    m_free(tt);
+
     return 0;
 }
 

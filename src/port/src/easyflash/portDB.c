@@ -69,7 +69,7 @@ int service_db_load_int(int key, int *value)
 	size_t rlen, alen;
 	
 	
-	rlen = ef_get_env_blob(convert_str_key(key), (unsigned char *)&value, sizeof(value), &alen);
+	rlen = ef_get_env_blob(convert_str_key(key), (unsigned char *)value, sizeof(*value), &alen);
 	if(rlen == 0)
 	{	
 		return -1;
