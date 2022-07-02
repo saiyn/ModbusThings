@@ -18,7 +18,8 @@ typedef struct mdb_bluk{
 	
 	int next_index;
 	
-	
+	char *dev_token;
+
 	int version_number;
 	
 
@@ -45,7 +46,7 @@ typedef struct mdb_bluk{
 
 
 
-mdb_bluk_t * mdb_bulk_service_init(void);
+mdb_bluk_t * mdb_bulk_service_init(char *);
 
 
 

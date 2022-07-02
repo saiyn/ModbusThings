@@ -175,18 +175,22 @@ static int post_bluk_data_by_file(struct mdb_bluk *mdbb, char *uri, char *file_n
 		return -1;
 	}
 
-
+	char api[128] = {0};
 	
-	return 0;
+	sprintf(api, "%s/%s/%s", BULK_SERVICE_API_PREFIX, mdbb->dev_token, BILK_SERVICE_API_SUFFIX);
+	
+	return service_bulk_post(api, file_name);
 }
 
 
-mdb_bluk_t * mdb_bulk_service_init(void)
+mdb_bluk_t * mdb_bulk_service_init(char *dev_token)
 {
 	mdb_bluk_t * mdbb = m_malloc(sizeof(mdb_bluk_t));
 	if(!mdbb){
 		return NULL;
 	}
+
+	mdbb->dev_token = dev_token;
 	
 	mdbb->cur_cached_off = 0;
 	

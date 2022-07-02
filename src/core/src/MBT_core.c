@@ -96,7 +96,7 @@ static int mdc_realtime_setup(mda_core_t *mdc)
 
 static int mdc_bulk_setup(mda_core_t *mdc)
 {
-	mdb_bluk_t *mdbb =  mdb_bulk_service_init();
+	mdb_bluk_t *mdbb =  mdb_bulk_service_init(mdc->token);
 	
 	mdc->md_bulk_service = mdbb;
 	

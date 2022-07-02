@@ -115,6 +115,14 @@ int service_attri_update(char *key, char *token, char* server_uri, char**config)
 }
 
 
+int service_bulk_post(const char* server_uri, const char* filename)
+{
+	
+	return httpclient_post_file(server_uri, filename, BULK_SERVICE_FORM_STR);
+	
+}
+
+
 
 
 
