@@ -46,8 +46,36 @@ static int parse_load(char *buf, simple_db_t *db)
 
 static int convert_save(simple_db_t *db)
 {
-    
+    char path[MBT_DB_FILE_PATH_LENGTH_MAX] = {0};
 
+    snprintf(path, MBT_DB_FILE_PATH_LENGTH_MAX, "%s.update", MBT_DB_FILE_PATH);
+
+    //first create a new file
+    int fd = m_open(path, O_WRONLY | O_CREAT);
+    if(fd < 0){
+        return NULL;
+    }
+
+
+    m_write(fd, "[", 1);
+
+    for(int i=0; i < db->size; i++){
+        char tmp[strlen(db->array[i]) + 6] = {0};
+
+        snprintf(tmp, sizeof(tmp), "{\"%d\":\"%s\"}", i, (char *)db->array[i]);
+        m_write(fd, tmp, strlen(tmp));
+
+        if(i + 1 == db->size){
+            m_write(fd, "]", 1);
+        }else{
+            m_write(fd, ",\n", 2);
+        }
+    }
+
+    m_close(fd);
+
+    //then, rename to overwrite the old file
+    return rename(path, MBT_DB_FILE_PATH);
 
 }
 
@@ -101,6 +129,9 @@ int MBT_simpleDbInit(void **handle, int key_num_max)
     db->size = key_num_max;
 
     *handle = db;
+
+    //if program exit before db update complete, we may see file suffix with .update
+    //check_tmp_file();
 
     char *buffer = load_data();
     if(!buffer){

@@ -13,7 +13,7 @@ enum {
 MBT_MQ MBT_mqCreate(int maxItem);
 
 
-int MBT_mqSend(MBT_MQ mq, void *msg, size_t size);
+int MBT_mqSend(MBT_MQ mq, void *msg);
 
 
 int MBT_mqSendUrgent(MBT_MQ mq, void *msg, size_t size);
@@ -22,7 +22,7 @@ int MBT_mqSendUrgent(MBT_MQ mq, void *msg, size_t size);
 int MBT_mqRecv(MBT_MQ mq, void **msg, int timeout);
 
 
-int MBT_mqDumpLimit(MBT_MQ mq, void (*do_dump)(void *msg, char *buf, size_t size), char *buf, size_t size, size_t max);
+int MBT_mqDumpLimit(MBT_MQ mq, int (*do_dump)(void *msg, char *buf, size_t size), char *buf, int off, size_t max);
 
 
 #endif

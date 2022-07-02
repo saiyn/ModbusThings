@@ -16,6 +16,8 @@ int m_read(int fd, void *buf, size_t len);
 
 int m_unlink(const char *pathname);
 
+int m_access(const char *pathname, int mode);
+
 int m_close(int d);
 
 
