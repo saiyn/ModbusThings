@@ -85,3 +85,53 @@ void httpclient_free(char *c)
 {
     (void)c;
 }
+
+
+int httpclient_post_file(const char* URI, const char* filename, const char* form_data)
+{
+    CURL* curl = curl_easy_init();
+    if(!curl){
+        return CURLE_FAILED_INIT;
+    }
+
+    char *recv_str = m_malloc(CURL_MAX_WRITE_SIZE);
+    if(!recv_str){
+        return -2;
+    }
+
+    memset(recv_str, 0, CURL_MAX_WRITE_SIZE);
+
+    curl_httppost *formpost = NULL;
+    curl_httppost *lastptr = NULL;
+
+    
+    curl_formadd(&formpost,
+               &lastptr,
+               CURLFORM_COPYNAME, form_data,
+               CURLFORM_FILE, filename,
+               CURLFORM_CONTENTTYPE, "application/octet-stream",
+               CURLFORM_END);
+
+
+    curl_easy_setopt(curl, CURLOPT_URL, URI);
+
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_stringBodyWrite);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, recv_str);
+
+    int rc = curl_easy_perform(curl);
+
+    curl_esay_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+
+    curl_easy_cleanup(curl);
+
+    curl_formfree(formpost);
+
+    //print response
+
+
+    m_free(recv_str);
+
+    return rc;
+}

@@ -172,7 +172,15 @@ static int update_head_index(struct mdb_bluk *mdbb)
 static int post_bluk_data_by_file(struct mdb_bluk *mdbb, char *uri, char *file_name)
 {
 	if(m_access(file_name, R_OK) != 0){
-		return -1;
+
+		//check whether we have posted the file
+		char tmp[64] = {0};
+		sprintf(tmp, "%s.%s", file_name, BULK_UPLOADED_FILE_SUFFIX);
+		if(m_access(tmp, 0) < 0){
+			return -1;
+		}
+
+		return -2;
 	}
 
 	char api[128] = {0};

@@ -5,15 +5,15 @@
 
 #include "MBT_config.h"
 
-#include "modbus_attributes.h"
+#include "MBT_attributes.h"
 
 #include "MBT_bulk.h"
 
-#include "modbus_realtime.h"
+#include "MBT_realtime.h"
 
 #include "MBT_scan.h"
 
-#include "modbus_network.h"
+#include "MBT_osNetwork.h"
 
 
 #include "cJSON.h"
@@ -115,6 +115,27 @@ static int mdc_scan_setup(mda_core_t *mdc)
 }
 
 
+static void check_post_status(mda_core_t *mdc, int reason, int rc)
+{
+	//old file upload
+	if(reason == CHECK_REASON_SCAN_FAIL){
+		//-2 means post fail due to no exist dat file but has dat.bk file, which means the tail index
+		//update in trouble
+		if(rc == 0 || rc == -2){
+			mdc->md_bulk_service->update_tail_index(mdc->md_bulk_service);
+		}else{
+			//will one file always post fail????
+		}
+		
+	}else{
+		if(rc == 0){
+			mdc->md_bulk_service->update_head_index(mdc->md_bulk_service);
+		}
+	}
+	
+}
+
+
 static void check_do_bulk_service(mda_core_t *mdc, int reason)
 {
 	//if network is not aviable, we can't do anything
@@ -125,10 +146,10 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 	
 	int rc = 0;
 	char *file_path = NULL;
-	char *bulk_server_uri = DEFAULT_SERVER_FQDN"/"DEFAULT_BULK_SERVICE_API;
+	char *bulk_server_uri = DEFAULT_SERVER_FQDN;
 	
 	
-	mba_load_attribute(ATTRI_BULK_SERVICE_URI, &bulk_server_uri, DEFAULT_SERVER_FQDN"/"DEFAULT_BULK_SERVICE_API);
+	mba_load_attribute(ATTRI_BULK_SERVICE_URI, &bulk_server_uri, DEFAULT_SERVER_FQDN);
 	
 	switch(reason){
 		//maybe the 485 bus is not connected, so we can check for upload bluk data cached in last working time

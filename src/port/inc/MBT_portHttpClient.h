@@ -14,8 +14,7 @@ void httpclient_free(char *);
 int httpclient_get_file(const char* URI, const char* filename);
 
 
-int httpclient_post_file(const char* URI, const char* filename,
-        const char* form_data);
+int httpclient_post_file(const char* URI, const char* filename, const char* form_data);
 
 #endif
 

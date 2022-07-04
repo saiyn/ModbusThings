@@ -42,8 +42,8 @@
 
 //bulk service
 #define BILK_SERVICE_API_SUFFIX		"bulktelemetry"
-#define BULK_SERVICE_API_PREFIX		"v1"
-#define BULK_SERVICE_FORM_STR			"filed1"			
+#define BULK_SERVICE_API_PREFIX		"api/v1"
+#define BULK_SERVICE_FORM_STR		"filed1"			
 #define BULK_SAVE_FILE_PREFIX   	"mbt"
 #define BULK_SAVE_FILE_SUFFIX   	"dat"
 #define BULK_UPLOADED_FILE_SUFFIX	"bk"
