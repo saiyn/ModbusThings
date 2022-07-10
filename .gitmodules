@@ -1,3 +1,9 @@
 [submodule "src/deps/libmodbus"]
 	path = src/deps/libmodbus
 	url = git@github.com:stephane/libmodbus.git
+[submodule "src/deps/mqttclient"]
+	path = src/deps/mqttclient
+	url = git@github.com:jiejieTop/mqttclient.git
+[submodule "src/deps/curl"]
+	path = src/deps/curl
+	url = git@github.com:curl/curl.git
