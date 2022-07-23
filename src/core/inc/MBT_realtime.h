@@ -25,10 +25,16 @@ typedef struct stat_ops{
 }stat_ops_t;
 
 
-typedef struct msg_ops{
+typedef struct msg_ops_node{
 	char *topic;
 	
 	void (*onMessage)(char *msg);
+}msg_ops_node_t;
+
+typedef struct msg_ops{
+	msg_ops_node_t nodes[REALTIME_SUBTOPIC_MAX_NUM];
+	
+	int n;
 	
 }msg_ops_t;
 

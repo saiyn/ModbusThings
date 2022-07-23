@@ -3,7 +3,10 @@
 #include "webclient.h"
 
 
-
+int httpclient_get_file(const char* URI, const char* filename)
+{
+	return webclient_get_file(URI, filename);
+}
 
 int httpclient_post_file(const char* URI, const char* filename, const char* form_data)
 {

@@ -2,10 +2,13 @@
 #define _MBT_CONFIG_H_
 
 //realtime service
+#define REALTIME_SUBTOPIC_MAX_NUM   (3)
 #define DEFAULT_SERVER_FQDN         "tqauto.asuscomm.com:9529"
 #define DEFAULT_DEV_UUID            "ModbusThings-000001"
 #define DEFAULT_BULK_SERVICE_API    ""
-#define REALTIME_SUBTOPIC           "v1/devices/me/attributes"
+#define REALTIME_ATTR_SUBTOPIC           "v1/devices/me/attributes"
+#define REALTIME_OTA_SUBTOPIC		"v1/devices/me/attributes/response/+"
+
 #define TELEMETRY_TOPIC             "v1/devices/me/telemetry"
 #define MQTT_OUT_CACHE_MAX          (50)
 #define MQTT_OUT_THREAD_PRIORITY    (20)
@@ -19,6 +22,12 @@
 
 #define DEV_ATTRI_CONFIG_KEY  "mb_config"
 
+
+#define DEV_OTA_API_PREFIX				"api/v1"
+#define DEV_OTA_API_SUFFIX				"firmware"
+
+
+#define DEV_OTA_FILE_PATH         "/ota_firmware.bin"
 
 
 #define DEV_ATTRI_CONFIG_EXPIRE_SECOND  (60*60*12)

@@ -15,6 +15,10 @@
 
 #include "MBT_osNetwork.h"
 
+#include "MBT_portHttpClient.h"
+
+
+#include "MBT_portOTA.h"
 
 #include "cJSON.h"
 
@@ -39,6 +43,12 @@ typedef struct mda_core{
 	int		ts;
 	
 	int config_update;
+
+	int ota_update;
+	
+	char *ota_title;
+	char *ota_version;
+	unsigned int ota_file_size;
 	
 	mdr_service_t *mdrs;
 	
@@ -193,6 +203,30 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 	
 }
 
+static void _do_ota(mda_core_t * mdc)
+{
+	
+	char uri[128] = {0};
+	
+	snprintf(uri,sizeof(uri),"%s/%s/%s/%s?title=%s&version=%s", DEFAULT_SERVER_FQDN,DEV_OTA_API_PREFIX,mdc->token,
+		DEV_OTA_API_SUFFIX, mdc->ota_title, mdc->ota_version);
+	
+	
+	LOG_I("try ota uri:%s", uri);
+	
+	int ret = httpclient_get_file(uri, DEV_OTA_FILE_PATH);
+		
+	if(ret == 0)
+	{
+		//sync to flash
+		LOG_I("download upgrade file:%s successfully", DEV_OTA_FILE_PATH);
+		
+		ret = OTA_action();
+	}
+	
+	
+}
+
 
 
 static void mdc_loop(void *arg)
@@ -218,6 +252,14 @@ static void mdc_loop(void *arg)
 					
 				
 				}
+		}
+
+		if(mdc->ota_update){
+			
+			mdc->ota_update = 0;
+			
+			_do_ota(mdc);
+			
 		}
 		
 		
@@ -323,6 +365,50 @@ static void realtime_msg_received(char *msg)
 }
 
 
+static void realtime_ota_msg_received(char *msg)
+{
+	
+	LOG_I("OTA:%s", msg);
+
+
+	cJSON *root = cJSON_Parse(msg);
+	if(root == NULL)
+	{
+		const char *error_ptr = cJSON_GetErrorPtr();
+		if(error_ptr != NULL)
+		{
+			LOG_E("prase json error: %s", error_ptr);
+		}
+		return;
+	}
+
+
+	cJSON *fw_title = cJSON_GetObjectItem(root, "fw_title");
+	if(fw_title){
+		
+		LOG_I("fw title update to:%s", fw_title->valuestring);
+		_mc.ota_title = m_strdup(fw_title->valuestring);
+	}
+
+	cJSON *fw_size = cJSON_GetObjectItem(root, "fw_size");
+	if(fw_size){
+		
+		LOG_I("fw firmware size :%d", fw_size->valueint);
+		_mc.ota_file_size = fw_size->valueint;
+	}
+	
+	cJSON *fw_ver = cJSON_GetObjectItem(root, "fw_version");
+	if(fw_ver){
+		LOG_I("fw version update to:%s", fw_ver->valuestring);
+		_mc.ota_version = m_strdup(fw_ver->valuestring);
+		
+		_mc.ota_update = 1;
+	}
+
+	
+}
+
+
 static void mdc_start(mda_core_t *mdc)
 {
 	stat_ops_t stat_ops = {
@@ -332,8 +418,17 @@ static void mdc_start(mda_core_t *mdc)
 	};
 	
 	msg_ops_t msg_ops = {
-		REALTIME_SUBTOPIC,
-		realtime_msg_received
+		.nodes = {
+			{
+				REALTIME_ATTR_SUBTOPIC,
+				realtime_msg_received
+			},
+			{
+				REALTIME_OTA_SUBTOPIC,
+				realtime_ota_msg_received
+			}
+		},
+		.n = 2
 	};
 	
 	

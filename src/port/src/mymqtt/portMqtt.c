@@ -12,6 +12,21 @@ static char _msg_pool[512];
 
 static int volatile _connected = 0;
 
+
+typedef void (*mqtt_sub_callback)(mqtt_client *c, message_data *msg_data);
+
+static void mqtt_sub_callback_0(mqtt_client *c, message_data *msg_data);
+static void mqtt_sub_callback_1(mqtt_client *c, message_data *msg_data);
+
+
+
+
+static mqtt_sub_callback _call_backs[] = {
+	mqtt_sub_callback_0,
+	mqtt_sub_callback_1
+	
+};
+
 void * mqtt_client_init(char *token, char *cid, char *uri)
 {
 	
@@ -154,9 +169,12 @@ void mqtt_client_start(void *userdata, stat_ops_t *stat_ops, msg_ops_t *msg_ops)
 	mqtt->offline_callback = mqtt_offline_callback;
 
 	/* set subscribe table and event callback */
-	mqtt->message_handlers[0].topicFilter = rt_strdup(msg_ops->topic);
-	mqtt->message_handlers[0].callback = mqtt_sub_callback;
-	mqtt->message_handlers[0].qos = QOS1;
+
+	for(int i = 0; i < msg_ops->n; i++){
+		mqtt->message_handlers[i].topicFilter = rt_strdup(msg_ops->nodes[i].topic);
+		mqtt->message_handlers[i].callback = _call_backs[i];
+		mqtt->message_handlers[i].qos = QOS1;
+	}
 	
 
 	/* set default subscribe event callback */
