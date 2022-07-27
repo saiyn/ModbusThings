@@ -1,7 +1,8 @@
 
 #include <stdlib.h>
 #include <time.h>
-
+#include <stdio.h>
+#include <string.h>
 
 #include "MBT_config.h"
 
@@ -14,18 +15,13 @@
 #include "MBT_scan.h"
 
 #include "MBT_osNetwork.h"
-
+#include "MBT_osThread.h"
 #include "MBT_portHttpClient.h"
-
-
+#include "MBT_osTimer.h"
+#include "MBT_osMemory.h"
 #include "MBT_portOTA.h"
 
 #include "cJSON.h"
-
-
-#define DBG_TAG              "mdc"
-#define DBG_LVL              DBG_LOG
-#include <rtdbg.h>
 
 
 
@@ -146,12 +142,12 @@ static void check_post_status(mda_core_t *mdc, int reason, int rc)
 }
 
 
-static void check_do_bulk_service(mda_core_t *mdc, int reason)
+static int check_do_bulk_service(mda_core_t *mdc, int reason)
 {
 	//if network is not aviable, we can't do anything
 	if(mdc->md_net_service->get_net_state() != MDB_NETWORK_ONLINE){
 		
-		return;
+		return -1;
 	}
 	
 	int rc = 0;
@@ -174,6 +170,8 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 				
 				//judge whether we need to retry according to the return code
 				check_post_status(mdc, CHECK_REASON_SCAN_FAIL, rc);
+			}else{
+				rc = -1;
 			}
 		
 			break;
@@ -192,6 +190,8 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 				//update index info according return status
 				check_post_status(mdc, CHECK_REASON_CACHE_FULL, rc);
 				
+			}else{
+				rc = -1;
 			}
 		
 			break;
@@ -199,7 +199,7 @@ static void check_do_bulk_service(mda_core_t *mdc, int reason)
 		
 	}
 		
-		
+	return -1;		
 	
 }
 
@@ -212,14 +212,14 @@ static void _do_ota(mda_core_t * mdc)
 		DEV_OTA_API_SUFFIX, mdc->ota_title, mdc->ota_version);
 	
 	
-	LOG_I("try ota uri:%s", uri);
+	//LOG_I("try ota uri:%s", uri);
 	
 	int ret = httpclient_get_file(uri, DEV_OTA_FILE_PATH);
 		
 	if(ret == 0)
 	{
 		//sync to flash
-		LOG_I("download upgrade file:%s successfully", DEV_OTA_FILE_PATH);
+		//LOG_I("download upgrade file:%s successfully", DEV_OTA_FILE_PATH);
 		
 		ret = OTA_action();
 	}
@@ -244,7 +244,7 @@ static void mdc_loop(void *arg)
 				
 				mds_parse_scan(mdc->config, (void *)0, mdc->md_scan_service);
 				if(rc < 0){
-					LOG_E("parse scan config fail, try to do bulk service");
+					//LOG_E("parse scan config fail, try to do bulk service");
 					
 					if(check_do_bulk_service(mdc, CHECK_REASON_CONFIG_ERROR) < 0){
 						m_sleep(3);
@@ -337,7 +337,7 @@ static void realtime_msg_received(char *msg)
 			const char *error_ptr = cJSON_GetErrorPtr();
 			if(error_ptr != NULL)
 			{
-				LOG_E("prase json error: %s", error_ptr);
+				//LOG_E("prase json error: %s", error_ptr);
 			}
 			return;
 		}
@@ -346,17 +346,17 @@ static void realtime_msg_received(char *msg)
 		cJSON *mb = cJSON_GetObjectItem(root, "mb_config");
 		if(mb){
 			
-			_mc->config_update = 1;
+			_mc.config_update = 1;
 			
 			
 			mba_save_attribute(ATTRI_DEV_CONFIG, mb->valuestring);
 			
 			
-			LOG_I("recv attribute mb_config update");
+			//LOG_I("recv attribute mb_config update");
 			
 		}else{
 			
-			LOG_W("unknown msg:%s", cJSON_PrintUnformatted(root));
+			//LOG_W("unknown msg:%s", cJSON_PrintUnformatted(root));
 		}
 	
 
@@ -368,7 +368,7 @@ static void realtime_msg_received(char *msg)
 static void realtime_ota_msg_received(char *msg)
 {
 	
-	LOG_I("OTA:%s", msg);
+	//LOG_I("OTA:%s", msg);
 
 
 	cJSON *root = cJSON_Parse(msg);
@@ -377,7 +377,7 @@ static void realtime_ota_msg_received(char *msg)
 		const char *error_ptr = cJSON_GetErrorPtr();
 		if(error_ptr != NULL)
 		{
-			LOG_E("prase json error: %s", error_ptr);
+			//LOG_E("prase json error: %s", error_ptr);
 		}
 		return;
 	}
@@ -386,20 +386,20 @@ static void realtime_ota_msg_received(char *msg)
 	cJSON *fw_title = cJSON_GetObjectItem(root, "fw_title");
 	if(fw_title){
 		
-		LOG_I("fw title update to:%s", fw_title->valuestring);
+		//LOG_I("fw title update to:%s", fw_title->valuestring);
 		_mc.ota_title = m_strdup(fw_title->valuestring);
 	}
 
 	cJSON *fw_size = cJSON_GetObjectItem(root, "fw_size");
 	if(fw_size){
 		
-		LOG_I("fw firmware size :%d", fw_size->valueint);
+		//LOG_I("fw firmware size :%d", fw_size->valueint);
 		_mc.ota_file_size = fw_size->valueint;
 	}
 	
 	cJSON *fw_ver = cJSON_GetObjectItem(root, "fw_version");
 	if(fw_ver){
-		LOG_I("fw version update to:%s", fw_ver->valuestring);
+		//LOG_I("fw version update to:%s", fw_ver->valuestring);
 		_mc.ota_version = m_strdup(fw_ver->valuestring);
 		
 		_mc.ota_update = 1;
@@ -435,7 +435,7 @@ static void mdc_start(mda_core_t *mdc)
 	mdc->mdrs->start(mdc->mdrs->userdata, &stat_ops, &msg_ops);
 	
 	
-	m_create_thread("mb-core", mdc_loop, mdc, MODBUS_CORE_THREAD_STACK_SIZE, MODBUS_CORE_THREAD_PRIORITY);
+	MBT_threadCreate("mb-core", mdc_loop, mdc, MODBUS_CORE_THREAD_STACK_SIZE, MODBUS_CORE_THREAD_PRIORITY);
 	
 }
 

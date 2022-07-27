@@ -1,14 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
+#include <time.h>
+
+
+#include "MBT_osMemory.h"
+#include "MBT_config.h"
 #include "MBT_bulk.h"
 #include "MBT_osFs.h"
 #include "MBT_attributes.h"
+#include "MBT_osTimer.h"
+#include "MBT_portServer.h"
 
-
-#define DBG_TAG              "mdbb"
-#define DBG_LVL              DBG_LOG
-#include <rtdbg.h>
+#if 0
 
 static char*get_date_str(void)
 {
@@ -16,7 +21,7 @@ static char*get_date_str(void)
 	
 	time_t now;
 	
-	now = time(NULL);
+	now = m_time(NULL);
 	
 	struct tm *p_tm = localtime(&now);
 
@@ -26,6 +31,8 @@ static char*get_date_str(void)
 	
 	return date;
 }
+
+#endif
 
 
 
@@ -77,14 +84,14 @@ static int save_bulk_data(struct mdb_bluk *mdbb)
 	int fd = m_open(fname, O_CREAT | O_RDWR | O_TRUNC);
 	if(fd < 0)
 	{
-		LOG_E("can't save file:%s", fname);
+		//LOG_E("can't save file:%s", fname);
 		return -1;
 	}
 	
 	int ret = m_write(fd, mdbb->cache_buf, mdbb->cur_cached_off);
 	if(ret !=  mdbb->cur_cached_off)
 	{
-		LOG_E("write file:%s fail:%d-%d", fname, ret,  mdbb->cur_cached_off);
+		//LOG_E("write file:%s fail:%d-%d", fname, ret,  mdbb->cur_cached_off);
 		rc = -1;
 	}
 	

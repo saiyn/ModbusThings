@@ -5,11 +5,12 @@
 
 #include "MBT_config.h"
 #include "MBT_portHttpClient.h"
-
-
+#include "MBT_portDB.h"
+#include "MBT_portServer.h"
 #include "MBT_attributes.h"
-
-#include "modbus_network.h"
+#include "MBT_osTimer.h"
+#include "MBT_osNetwork.h"
+#include "MBT_osMemory.h"
 
 
 
@@ -58,8 +59,8 @@ static int do_dev_provisioning(struct mdb_network *mdbn, char **token, char *ser
 	
 	//need to log out error to warn caller set uuid first
 	int rc = mba_load_attribute(ATTRI_DEV_UUID, &uuid, DEFAULT_DEV_UUID);
-	//if(rc < 0)
-		//return rc;
+	if(rc < 0)
+		return rc;
 	
 	
 	return service_dev_provision(token, server_uri, uuid);

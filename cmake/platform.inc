@@ -35,7 +35,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   #
   # Get OS information and store in variable TD_OS_INFO.
   #
-  execute_process(COMMAND chmod 777 ${TD_COMMUNITY_DIR}/packaging/tools/get_os.sh)
+  #execute_process(COMMAND chmod 777 ${TD_COMMUNITY_DIR}/packaging/tools/get_os.sh)
   execute_process(COMMAND readlink /bin/sh OUTPUT_VARIABLE SHELL_LINK)
   MESSAGE(STATUS "The shell is: " ${SHELL_LINK})
 

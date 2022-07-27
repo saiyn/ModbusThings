@@ -70,6 +70,8 @@ ELSE ()
     MESSAGE(STATUS "Build Release Version in Windows as default")
   ELSE ()
     SET(CMAKE_BUILD_TYPE "Debug")
+
     MESSAGE(STATUS "Build Debug Version as default")
+    
   ENDIF()
 ENDIF ()

@@ -96,4 +96,4 @@ MESSAGE(STATUS "============= compile version parameter information end  =======
 
 STRING(REPLACE "." "_" TD_LIB_VER_NUMBER ${TD_VER_NUMBER})
 
-CONFIGURE_FILE("${TD_COMMUNITY_DIR}/src/util/src/version.c.in" "${TD_COMMUNITY_DIR}/src/util/src/version.c")
+#CONFIGURE_FILE("${TD_COMMUNITY_DIR}/src/util/src/version.c.in" "${TD_COMMUNITY_DIR}/src/util/src/version.c")

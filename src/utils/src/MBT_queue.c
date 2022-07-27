@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <assert.h>
 #include <sys/time.h>
 
 #include "MBT_osMemory.h"
@@ -42,6 +43,7 @@ MBT_MQ MBT_mqCreate(int maxItem)
 
     q->head = q->tail = NULL;
 
+    return q;
 }
 
 
@@ -79,6 +81,8 @@ int MBT_mqSend(MBT_MQ mq, void *msg)
 
     pthread_cond_signal(&q->notify);
 
+    return 0;
+
 }
 
 
@@ -99,11 +103,11 @@ int MBT_mqRecv(MBT_MQ mq, void **msg, int timeout)
             gettimeofday(&tv, NULL);
 
             struct timespec ts = {
-                .tv_sec = tv.tv_sec + timeout;
-                .tv_nsec = tv.tv_usec * 1000;
+                .tv_sec = tv.tv_sec + timeout,
+                .tv_nsec = tv.tv_usec * 1000,
             };
 
-            rc = pthread_cond_timedwait(&q->notify, &ts, &q->lock);
+            rc = pthread_cond_timedwait(&q->notify, &q->lock, &ts);
 
             if(rc < 0){
                 pthread_mutex_unlock(&q->lock);
@@ -138,7 +142,7 @@ int MBT_mqRecv(MBT_MQ mq, void **msg, int timeout)
 
 
 
-int MBT_mqDumpLimit(MBT_MQ mq, void (*do_dump)(void *msg, char *buf, size_t size), char *buf, int off, size_t max)
+int MBT_mqDumpLimit(MBT_MQ mq, int (*do_dump)(void *msg, char *buf, size_t size), char *buf, int off, size_t max)
 {
     size_t total = 0;
 
