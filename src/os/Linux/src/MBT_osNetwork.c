@@ -1,9 +1,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <string.h>
 
 #include "MBT_config.h"
 #include "MBT_osNetwork.h"
+#include "MBT_osMemory.h"
 
 
 static int get_net_state(void)
@@ -32,7 +34,7 @@ static int wait_for_ready(int timeout)
 {
 
 
-
+    return 0;
 }
 
 

@@ -3,8 +3,8 @@
 
 
 typedef void*   MBT_DB_HANDLE;
-typedef int     MBT_DB_KEY
-typedef char*   MBT_DB_VALUE
+typedef int     MBT_DB_KEY;
+typedef char*   MBT_DB_VALUE;
 
 
 

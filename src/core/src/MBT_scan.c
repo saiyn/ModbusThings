@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MBT_portMaster.h"
+#include "MBT_osMemory.h"
+#include "MBT_osTimer.h"
 
 
 #define MB_TYPE_COILS 				"coils"
@@ -78,9 +80,9 @@ static int parse_input_reg_config(cJSON *conf, mds_scan_t* re)
 		//alloc mem for scan result
 		
 		node->size = (node->reg.input.offset - node->reg.input.start) * sizeof(unsigned short);
-		node->value = (unsigned short *)malloc(node->size);
+		node->value = (unsigned short *)m_malloc(node->size);
 		
-		snprintf(node->alias_name, sizeof(node->alias_name), "%d:%s", ad->valueint, la->valuestring);
+		snprintf(node->alias_name, sizeof(node->alias_name), "%ld:%s", ad->valueint, la->valuestring);
 		
 		if(re->head == NULL){
 			re->head = node;
@@ -180,7 +182,7 @@ int mds_scan(mds_scan_t *scan)
 			
 					node->stat = retval < 0 ? MB_SCAN_FAIL : MB_SCAN_SUCCESS;
 
-					LOG_I("[%s] scan %s", node->alias_name, node->stat == MB_SCAN_SUCCESS ? "success" : "fail");
+					//LOG_I("[%s] scan %s", node->alias_name, node->stat == MB_SCAN_SUCCESS ? "success" : "fail");
 				break;
 			
 			default:

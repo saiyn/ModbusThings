@@ -1,10 +1,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 #include "MBT_osFs.h"
 
 
-int m_open(const char *pathname, int flags)
+int m_open(const char *pathname, int flags, ...)
 {
 	
 	return open(pathname, flags);

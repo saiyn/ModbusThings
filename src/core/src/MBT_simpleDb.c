@@ -1,8 +1,11 @@
+#include <string.h>
+#include <stdio.h>
 
 #include "MBT_config.h"
 #include "MBT_osFs.h"
 #include "cJSON.h"
 #include "MBT_simpleDb.h"
+#include "MBT_osMemory.h"
 
 typedef struct simple_db{
     int size;
@@ -42,6 +45,7 @@ static int parse_load(char *buf, simple_db_t *db)
         }
     }
 
+    return 0;
 }
 
 static int convert_save(simple_db_t *db)
@@ -53,14 +57,16 @@ static int convert_save(simple_db_t *db)
     //first create a new file
     int fd = m_open(path, O_WRONLY | O_CREAT);
     if(fd < 0){
-        return NULL;
+        return -1;
     }
 
 
     m_write(fd, "[", 1);
 
     for(int i=0; i < db->size; i++){
-        char tmp[strlen(db->array[i]) + 6] = {0};
+        char tmp[strlen(db->array[i]) + 6];
+
+        memset(tmp, 0, sizeof(tmp));
 
         snprintf(tmp, sizeof(tmp), "{\"%d\":\"%s\"}", i, (char *)db->array[i]);
         m_write(fd, tmp, strlen(tmp));
@@ -90,7 +96,7 @@ static char* load_data(void)
 
     int rc = m_stat(MBT_DB_FILE_PATH, &buf);
     if(rc != 0){
-        return -1;
+        return NULL;
     }
 
     char *buffer = m_malloc(buf.st_size+1);
@@ -122,7 +128,7 @@ int MBT_simpleDbInit(void **handle, int key_num_max)
 
     db->array = m_malloc(sizeof(char *) * key_num_max);
     if(!db->array){
-        free(db);
+        m_free(db);
         return -1;
     }
 

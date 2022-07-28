@@ -1,6 +1,7 @@
 
 #include <pthread.h>
 
+#include "MBT_osMemory.h"
 #include "MBT_osThread.h"
 
 MBT_threadHandle MBT_threadCreate(const char *name, void (*fn)(void *), void *arg, size_t stack_size, int priority)
