@@ -221,7 +221,7 @@ static void _do_ota(mda_core_t * mdc)
 		//sync to flash
 		//LOG_I("download upgrade file:%s successfully", DEV_OTA_FILE_PATH);
 		
-		ret = OTA_action();
+		//ret = OTA_action();
 	}
 	
 	

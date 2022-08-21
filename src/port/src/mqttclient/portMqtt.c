@@ -1,12 +1,18 @@
-#include "modbus_realtime.h"
-#include "MBT_portMqtt.h"
+#include <stddef.h>
 #include "MBT_config.h"
+
+#include "MBT_realtime.h"
+#include "MBT_portMqtt.h"
+
 #include "MBT_queue.h"
 #include "MBT_osThread.h"
 
-
+#include "MBT_osMemory.h"
 #include "mqttclient.h"
 
+
+#define container_of(ptr, type, member) \
+  ((type*) ((uintptr_t) (ptr) - offsetof(type, member)))
 
 typedef struct mqttAdapter{
 
@@ -43,7 +49,10 @@ static void mqtt_sub_callback(void* client, message_data_t* msg)
     MQTT_LOG_I("%s:%d %s()...\ntopic: %s\nmessage:%s", __FILE__, __LINE__, __FUNCTION__, msg->topic_name, (char*)msg->message->payload);
     MQTT_LOG_I("-----------------------------------------------------------------------------------");
 
-    _msg_ops->onMessage((char*)msg->message->payload);
+    struct mqttAdapter *mqtt = container_of(client, struct mqttAdapter, client);
+
+
+    mqtt->msg_ops->nodes[0].onMessage((char*)msg->message->payload);
 
 }
  
@@ -57,7 +66,7 @@ static void mqtt_send_thread(void *arg)
 
     for(;;){
 
-        rc = MBT_mqRecv(mqtt->mq, &raw, -1);
+        rc = MBT_mqRecv(mqtt->mq, (void **)&raw, -1);
         if(rc == 0){
             mqtt_message_t msg;
             memset(&msg, 0, sizeof(msg));
@@ -88,7 +97,7 @@ void mqtt_client_start(void *userdata, struct stat_ops *stat_ops, struct msg_ops
 
     mqtt_connect(client);
 
-    mqtt_subscribe(client, msg_ops->topic, QOS1, mqtt_sub_callback);
+    mqtt_subscribe(client, msg_ops->nodes[0].topic, QOS1, mqtt_sub_callback);
 
 
     mqtt->msg_ops = msg_ops;
@@ -121,7 +130,7 @@ static int do_dump(void *msg, char *buf, size_t size)
     struct telemetry *tt = (struct telemetry *)msg;
 
     if(tt->size > size){
-        return -1
+        return -1;
     }
 
     memcpy(buf, tt->msg, tt->size);

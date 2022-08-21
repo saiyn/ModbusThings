@@ -75,3 +75,9 @@ ELSE ()
     
   ENDIF()
 ENDIF ()
+
+
+
+SET(LINK_MODBUS "-L${CMAKE_BINARY_DIR}/build/lib -lmodbus")
+
+SET(LINK_MQTT "-L${TD_COMMUNITY_DIR}/src/deps/mqttclient/build/lib -lmc-mqttclient")

@@ -12,19 +12,23 @@ ADD_SUBDIRECTORY(cJson)
 ADD_SUBDIRECTORY(curl)
 
 
-IF (TD_LINUX_64 AND JEMALLOC_ENABLED)
+IF (TD_LINUX_64)
   MESSAGE("")
-  MESSAGE("${Green} ENABLE jemalloc ${ColourReset}")
-  MESSAGE("")
-  MESSAGE("setup deps/jemalloc, current source dir:" ${CMAKE_CURRENT_SOURCE_DIR})
+  MESSAGE("setup deps/libmodbus, current source dir:" ${CMAKE_CURRENT_SOURCE_DIR})
   MESSAGE("binary dir:" ${CMAKE_BINARY_DIR})
   include(ExternalProject)
-  ExternalProject_Add(jemalloc
-    PREFIX        "jemalloc"
-    SOURCE_DIR    ${CMAKE_CURRENT_SOURCE_DIR}/jemalloc
+  ExternalProject_Add(libmodbus
+    PREFIX        "libmodbus"
+    SOURCE_DIR    ${CMAKE_CURRENT_SOURCE_DIR}/libmodbus
     BUILD_IN_SOURCE     1
-    CONFIGURE_COMMAND   ./autogen.sh COMMAND ./configure --prefix=${CMAKE_BINARY_DIR}/build/
+    CONFIGURE_COMMAND   ./configure --prefix=${CMAKE_BINARY_DIR}/build/
     BUILD_COMMAND       ${MAKE}
   )
-  INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/build/include)
+  #TARGET_INCLUDE_DIRECTORIES(modbus PUBLIC ${CMAKE_BINARY_DIR}/build/include)
 ENDIF ()
+
+
+
+ADD_SUBDIRECTORY(mqttclient)
+
+

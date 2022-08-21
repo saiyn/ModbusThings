@@ -7,12 +7,9 @@
 #include "MBT_portServer.h"
 
 #include "MBT_config.h"
-
+#include "MBT_osMemory.h"
 #include "MBT_portHttpClient.h"
 
-#define DBG_TAG              "portServer"
-#define DBG_LVL              DBG_LOG
-#include <rtdbg.h>
 
 
 #define GENE_PROVISION_REQUEST(data, off, name, key, sec) do{				\
@@ -37,7 +34,7 @@ static int parse_token(char *rsp, char **token)
 				cJSON *toke = cJSON_GetObjectItem(root ,"credentialsValue");
 				if(toke){
 					//strncpy(*token, toke->valuestring, size);
-					*token = rt_strdup(toke->valuestring);
+					*token = m_strdup(toke->valuestring);
 					
 					return 0;
 				}
@@ -79,8 +76,8 @@ int service_dev_provision(char **token, char *server_uri, char *devid)
 	GENE_PROVISION_REQUEST(post_data, index, devName,TB_PROVISION_DEVICE_KEY, TB_PROVISION_DEVICE_SEC);
 	
 	
-	httpclient_request_header_add(&header, "Content-Length: %d\r\n", strlen(post_data));
-  httpclient_request_header_add(&header, "Content-Type: application/json\r\n");
+	httpclient_request_header_add((void **)&header, "Content-Length: %d\r\n", strlen(post_data));
+  httpclient_request_header_add((void **)&header, "Content-Type: application/json\r\n");
 	
 	if (httpclient_request(req_uri, (const char *)header, post_data, (unsigned char **)&request) < 0)
 	{
@@ -103,7 +100,7 @@ int service_attri_update(char *key, char *token, char* server_uri, char**config)
 	int rc = snprintf(uri, sizeof(uri), "%s/api/v1/%s/attributes?sharedKeys=%s", server_uri, token, key);
 	if(rc >= sizeof(uri)){
 		
-		LOG_E("need redefine uri size");
+		//LOG_E("need redefine uri size");
 		return -1;
 	}
 	

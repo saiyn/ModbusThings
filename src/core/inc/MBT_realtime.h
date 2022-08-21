@@ -1,8 +1,12 @@
 #ifndef _MODBUS_REALTIME_H_
 #define _MODBUS_REALTIME_H_
 
+#include <stddef.h>
+
 
 #define REALTIME_ERR_QUEUE_FULL  (2)
+
+#define REALTIME_OUT_CACHE_MAX   (50)
 
 struct mdb_bluk;
 

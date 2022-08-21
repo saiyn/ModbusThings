@@ -1,8 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "MBT_portDB.h"
 
 #include "MBT_simpleDb.h"
 
-MBT_DB_HANDLE *_db;
+MBT_DB_HANDLE _db;
 
 int service_db_init(int key_num_max)
 {
@@ -20,12 +22,12 @@ int service_db_save(int key, char *value)
     return MBT_simpleDbPut(_db, key, value);
 }
 
-int service_db_load_int(int key, int *value)
+int service_db_load_int(int key, int *v)
 {
     char *value = NULL;
 
     if((value = MBT_simpleDbGet(_db, key))){
-        *value = atoi(value);
+        *v = atoi(value);
         return 0;
     }
 

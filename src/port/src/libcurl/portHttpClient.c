@@ -1,6 +1,9 @@
-
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 #include "curl/curl.h"
 #include "MBT_portHttpClient.h"
+#include "MBT_osMemory.h"
 
 
 int httpclient_request_header_add(void **request_header, const char *fmt, ...)
@@ -13,11 +16,11 @@ int httpclient_request_header_add(void **request_header, const char *fmt, ...)
 
     va_start(args, fmt);
 
-    vnsprintf(tmp, sizeof(tmp), fmt, args);
+    vsnprintf(tmp, sizeof(tmp), fmt, args);
 
     va_end(args);
 
-    *cs = curl_slist_append(*cs, tmp);
+    cs = curl_slist_append(cs, tmp);
 
 
     return 0;
@@ -42,7 +45,7 @@ int httpclient_request(const char *URI, const void *header, const char *post_dat
         return CURLE_FAILED_INIT;
     }
 
-    char *recv_str = m_malloc(CURL_MAX_WRITE_SIZE);
+    unsigned char *recv_str = m_malloc(CURL_MAX_WRITE_SIZE);
     if(!recv_str){
         return -2;
     }
@@ -66,7 +69,7 @@ int httpclient_request(const char *URI, const void *header, const char *post_dat
 
     int rc = curl_easy_perform(curl);
 
-    curl_esay_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
 
     if(shead){
         curl_slist_free_all(shead);
@@ -101,8 +104,8 @@ int httpclient_post_file(const char* URI, const char* filename, const char* form
 
     memset(recv_str, 0, CURL_MAX_WRITE_SIZE);
 
-    curl_httppost *formpost = NULL;
-    curl_httppost *lastptr = NULL;
+    struct curl_httppost *formpost = NULL;
+    struct curl_httppost *lastptr = NULL;
 
     
     curl_formadd(&formpost,
@@ -122,7 +125,9 @@ int httpclient_post_file(const char* URI, const char* filename, const char* form
 
     int rc = curl_easy_perform(curl);
 
-    curl_esay_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+    int code = 0;
+
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
 
     curl_easy_cleanup(curl);
 
@@ -134,4 +139,11 @@ int httpclient_post_file(const char* URI, const char* filename, const char* form
     m_free(recv_str);
 
     return rc;
+}
+
+
+int httpclient_get_file(const char* URI, const char* filename)
+{
+
+    return 0;
 }
