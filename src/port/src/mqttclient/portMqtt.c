@@ -17,7 +17,7 @@
 typedef struct mqttAdapter{
 
     mqtt_client_t *client;
-    struct msg_ops * msg_ops;
+    struct msg_ops msg_ops;
     MBT_MQ mq;
 }mqttAdapter_t;
 
@@ -52,7 +52,7 @@ static void mqtt_sub_callback(void* client, message_data_t* msg)
     struct mqttAdapter *mqtt = container_of(client, struct mqttAdapter, client);
 
 
-    mqtt->msg_ops->nodes[0].onMessage((char*)msg->message->payload);
+    mqtt->msg_ops.nodes[0].onMessage((char*)msg->message->payload);
 
 }
  
@@ -100,7 +100,7 @@ void mqtt_client_start(void *userdata, struct stat_ops *stat_ops, struct msg_ops
     mqtt_subscribe(client, msg_ops->nodes[0].topic, QOS1, mqtt_sub_callback);
 
 
-    mqtt->msg_ops = msg_ops;
+    mqtt->msg_ops = *msg_ops;
 
     mqtt->mq = MBT_mqCreate(REALTIME_OUT_CACHE_MAX);
 

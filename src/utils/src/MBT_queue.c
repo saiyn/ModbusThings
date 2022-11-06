@@ -64,7 +64,7 @@ int MBT_mqSend(MBT_MQ mq, void *msg)
     qitem_t *item = m_malloc(sizeof(qitem_t));
 
     item->msg = msg;
-    item->msg = NULL;
+    item->next = NULL;
 
     if(q->tail){
         q->tail->next = item;
