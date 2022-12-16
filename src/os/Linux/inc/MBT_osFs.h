@@ -22,7 +22,7 @@ int m_access(const char *pathname, int mode);
 
 int m_close(int d);
 
-
+int m_compressFile(char *srcFileName, char *destFileName);
 
 
 
