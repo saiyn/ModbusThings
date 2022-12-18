@@ -132,6 +132,8 @@ int MBT_simpleDbInit(void **handle, int key_num_max)
         return -1;
     }
 
+    memset(db->array, 0, sizeof(char *) * key_num_max);
+
     db->size = key_num_max;
 
     *handle = db;

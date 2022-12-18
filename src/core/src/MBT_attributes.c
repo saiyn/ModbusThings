@@ -13,7 +13,7 @@
 #include "MBT_osMemory.h"
 
 
-
+#include "MBT_core_log.h"
 
 
 
@@ -28,6 +28,7 @@ static int check_config_update(char *token ,char *config, char *server_uri)
 	
 	int rc = service_attri_update(DEV_ATTRI_CONFIG_KEY, token , server_uri,&new_config);
 	if(rc < 0){
+		MBT_CORE_LOG_ERROR("attri update fail");
 		return rc;
 	}
 	
@@ -38,6 +39,8 @@ static int check_config_update(char *token ,char *config, char *server_uri)
 		time_t now = m_time(NULL);
 		
 		mba_save_attribute_int(ATTRI_DEV_CONFIG_TS, now);
+
+		MBT_CORE_LOG_INFO("config update from service: %s", server_uri);
 	}
 	
 	

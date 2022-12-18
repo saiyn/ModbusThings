@@ -57,4 +57,24 @@
 #define BULK_SAVE_FILE_SUFFIX   	"dat"
 #define BULK_UPLOADED_FILE_SUFFIX	"bk"
 
+
+//log
+#define MBT_DEFAULT_LOG_BUF_SIZE (10 * 1024)  // 10KB
+#define DEFAULT_LOG_INTERVAL 25
+#define LOG_INTERVAL_STEP 5
+#define MIN_LOG_INTERVAL 5
+#define MAX_LOG_INTERVAL 25
+#define LOG_MAX_WAIT_MSEC 1000
+#define MBT_LOG_DIR "/var/log/mbt"
+
+
+
+
+
+
+
+
+
+
+
 #endif

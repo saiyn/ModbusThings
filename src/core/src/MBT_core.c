@@ -23,7 +23,7 @@
 
 #include "cJSON.h"
 
-
+#include "MBT_core_log.h"
 
 enum{
 	CHECK_REASON_SCAN_FAIL = 0,
@@ -65,6 +65,8 @@ static int mdc_network_setup(mda_core_t *mc)
 	
 	mc->md_net_service = mdb_network_service_init();
 	
+	MBT_CORE_LOG_INFO("network setup success");
+
 	return 0;
 }
 
