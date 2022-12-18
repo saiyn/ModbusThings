@@ -1,9 +1,4 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
+#include "MBT_os.h"
 #include "MBT_osFs.h"
 #include "zlib.h"
 
@@ -143,7 +138,7 @@ void m_removeOldLogFiles(char *rootDir, int32_t keepDays) {
       }
 
       if (fileSec <= 100) continue;
-      int32_t days = (int32_t)(ABS(sec - fileSec) / 86400 + 1);
+      int32_t days = (int32_t)(abs(sec - fileSec) / 86400 + 1);
       if (days > keepDays) {
         (void)remove(filename);
         //uInfo("file:%s is removed, days:%d keepDays:%d", filename, days, keepDays);

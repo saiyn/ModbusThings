@@ -1,7 +1,5 @@
 
-#include <pthread.h>
-
-#include "MBT_osMemory.h"
+#include "MBT_os.h"
 
 
 #include "MBT_osThread.h"
@@ -16,14 +14,14 @@ MBT_threadHandle MBT_threadCreate(const char *name, void (*fn)(void *), void *ar
 
     thread_entry = (void *(*)(void *))fn;
 
-    pthread_t *pt = m_malloc(sizeof(pthread_t));
+    pthread_t *pt = MBT_malloc(sizeof(pthread_t));
     if(!pt){
         return NULL;
     }
 
     int rc = pthread_create(pt, NULL, thread_entry, arg);
     if(rc){
-        m_free(pt);
+        MBT_free(pt);
         return NULL;
     }
 

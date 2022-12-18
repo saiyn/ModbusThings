@@ -15,7 +15,9 @@ extern "C"{
 
 #include "osMemory.h"
 
+#include "osAtomic.h"
 
+#include "osDef.h"
 
 #ifdef __cplusplus
 }

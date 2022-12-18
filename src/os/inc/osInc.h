@@ -9,26 +9,32 @@ extern "C"{
 
 
 #include <errno.h>
-
+#include <stdio.h>
 #include <stdint.h>
-
+#include <stdlib.h>
 #include <pthread.h>
-
+#include <string.h>
 #include <semaphore.h>
-
+#include <math.h>
 
 #include <stdarg.h>
 #include <stdbool.h>
+
+
+
 
 //#if defined(_TD_LINUX_64) || defined(_TD_LINUX_32) || defined(_TD_MIPS_64)  || defined(_TD_ARM_32) || defined(_TD_ARM_64)  || defined(_TD_DARWIN_64)
 
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <sys/file.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <inttypes.h>
- #include <sys/syscall.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
 
 #if defined(_TD_DARWIN_64)
     #include <dispatch/dispatch.h>
@@ -53,7 +59,7 @@ extern "C"{
 
 
 
-//#endif
+
 
 
 

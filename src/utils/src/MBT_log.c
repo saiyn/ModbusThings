@@ -4,6 +4,11 @@
 
 #include "MBT_log.h"
 
+#include "MBT_osFs.h"
+#include "MBT_osTimer.h"
+#include "MBT_osMemory.h"
+#include "MBT_osThread.h"
+
 #define LOG_FILE_NAME_LEN          300
 
 #define MAX_LOGLINE_SIZE              (1000)
@@ -49,6 +54,11 @@ static SLogObj   msLogObj = { .fileNum = 1 };
 int32_t writeInterval = DEFAULT_LOG_INTERVAL;
 static int8_t   msLogInited = 0;
 int32_t msLogKeepDays = 0;
+
+
+int32_t uDebugFlag = (DEBUG_FILE) | (DEBUG_INFO) | (DEBUG_FATAL) | (DEBUG_SCREEN);
+
+int32_t coreDebugFlag = (DEBUG_FILE) | (DEBUG_INFO) | (DEBUG_FATAL) | (DEBUG_SCREEN);
 
 
 static SLogBuff *logBuffNew(int32_t bufSize) {
@@ -265,7 +275,7 @@ static void keepOldLog(char *oldName) {
     }
   }
 
-  m_removeOldLogFiles(MBT_LOG_DIR, ABS(msLogKeepDays));
+  m_removeOldLogFiles(MBT_LOG_DIR, abs(msLogKeepDays));
 }
 
 static void *threadToOpenNewFile(void *param) {
@@ -384,7 +394,7 @@ int32_t MBT_initLog(char *logName, int numOfLogLines, int maxFiles) {
 
     int8_t expected = 0;
 
-    if(!atomic_val_compare_exchange_8(&msLogInited, &expected, 1)){
+    if(!atomic_val_compare_exchange_8(&msLogInited, expected, 1)){
         return 0;
     }
 
@@ -478,7 +488,7 @@ void MBT_closeLog() {
 
         int8_t excepted = 1;
 
-        atomic_val_compare_exchange_8(&msLogInited, &excepted, 0);
+        atomic_val_compare_exchange_8(&msLogInited, excepted, 0);
 
 
         m_free(msLogObj.logHandle);

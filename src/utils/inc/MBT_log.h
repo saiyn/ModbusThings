@@ -20,6 +20,22 @@ extern "C"{
 #define DEBUG_FILE   128U
 
 
+extern int32_t uDebugFlag;
+extern int32_t coreDebugFlag;
+
+
+#define MBT_LOG_INFO(...) do{                                              \
+    if(uDebugFlag & (DEBUG_INFO)){                                         \
+        MBT_printLog("UTL INFO: ", uDebugFlag, __VA_ARGS__);                 \
+    }                                                                      \
+}while(0)
+
+
+
+
+
+
+
 int32_t MBT_initLog(char *logName, int32_t numOfLogLines, int32_t maxFiles);
 void    MBT_closeLog();
 void    MBT_resetLog();
