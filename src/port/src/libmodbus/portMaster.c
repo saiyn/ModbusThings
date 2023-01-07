@@ -22,21 +22,15 @@ void *MBT_masterInit(void)
 
 #endif
 
-
-    if(ctx )
-
     modbus_set_debug(ctx, TRUE);
     modbus_set_error_recovery(ctx,
                               MODBUS_ERROR_RECOVERY_LINK |
                               MODBUS_ERROR_RECOVERY_PROTOCOL);
 
-                        
-
     modbus_set_response_timeout(ctx, 0, 999999);
 
 
     if (modbus_connect(ctx) == -1) {
-        //fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
         MBT_PORT_LOG_ERROR("modbus", "Connection failed: %s\n", modbus_strerror(errno));
         modbus_free(ctx);
         return NULL;
