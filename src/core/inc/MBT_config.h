@@ -3,7 +3,7 @@
 
 //realtime service
 #define REALTIME_SUBTOPIC_MAX_NUM   (3)
-#define DEFAULT_SERVER_FQDN         "tqauto.asuscomm.com:9529"
+#define DEFAULT_SERVER_FQDN         "www.tqautotech.com"
 #define DEFAULT_DEV_UUID            "ModbusThings-000001"
 #define DEFAULT_BULK_SERVICE_API    ""
 #define REALTIME_ATTR_SUBTOPIC           "v1/devices/me/attributes"
@@ -34,6 +34,9 @@
 
 
 //modbus master
+
+#define MODBUS_USE_TCP_BACKEND
+
 #define MODBUS_MASTER_DEVICE  "/dev/uart1"
 #define MODBUS_MASTER_BAUDRATE  9600
 #define MODBUS_MASTER_PORITY   'N'

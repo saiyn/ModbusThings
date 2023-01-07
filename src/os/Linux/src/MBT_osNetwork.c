@@ -7,6 +7,7 @@
 #include "MBT_osNetwork.h"
 #include "MBT_osMemory.h"
 
+#include <stdio.h>
 
 static int get_net_state(void)
 {
@@ -19,7 +20,10 @@ static int get_net_state(void)
     hints.ai_flags = 0;
     hints.ai_protocol = 0;          /* Any protocol */
 
-    int rc = getaddrinfo(DEFAULT_SERVER_FQDN, "80", &hints, &result);
+    int rc = getaddrinfo(DEFAULT_SERVER_FQDN, "8080", &hints, &result);
+
+    printf("getaddrinfo:%d\n", rc);
+
     if(rc == EAI_AGAIN){
         return MDB_NETWORK_OFFLINE;
     }else if(rc < 0){

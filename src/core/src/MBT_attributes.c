@@ -54,6 +54,9 @@ static int do_dev_provisioning(struct mdb_network *mdbn, char **token, char *ser
 	//we have to wait util the network get ready 
 	while(mdbn->get_net_state() != MDB_NETWORK_ONLINE){
 		
+		MBT_CORE_LOG_INFO("try do dev provisioning, waiting for network ready");
+
+
 		m_sleep(1);
 		
 	}

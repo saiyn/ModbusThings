@@ -77,7 +77,7 @@ int service_dev_provision(char **token, char *server_uri, char *devid)
 	
 	
 	httpclient_request_header_add((void **)&header, "Content-Length: %d\r\n", strlen(post_data));
-  httpclient_request_header_add((void **)&header, "Content-Type: application/json\r\n");
+    httpclient_request_header_add((void **)&header, "Content-Type: application/json\r\n");
 	
 	if (httpclient_request(req_uri, (const char *)header, post_data, (unsigned char **)&request) < 0)
 	{

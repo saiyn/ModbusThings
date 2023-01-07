@@ -265,12 +265,14 @@ static void mdc_loop(void *arg)
 		}
 		
 		
-		char *result;
+		char *result = NULL;
 		
 		rc = mds_scan(mdc->md_scan_service);
 		 
 		if(rc < 0){
 			
+			MBT_CORE_LOG_INFO("scan fail, try to bulk service");
+
 			if(check_do_bulk_service(mdc, CHECK_REASON_SCAN_FAIL)  < 0){
 				m_sleep(1);
 			}

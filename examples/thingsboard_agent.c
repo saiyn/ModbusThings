@@ -13,6 +13,8 @@ int main(int agrc, char* argv[])
 
     modbus_core_start();
 
+    
+
 
     return 0;
 }

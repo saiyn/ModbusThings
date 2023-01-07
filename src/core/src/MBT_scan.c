@@ -7,6 +7,8 @@
 #include "MBT_osMemory.h"
 #include "MBT_osTimer.h"
 
+#include "MBT_core_log.h"
+
 
 #define MB_TYPE_COILS 				"coils"
 #define MB_TYPE_DISCRET_INPUT "discret_input"
@@ -182,7 +184,7 @@ int mds_scan(mds_scan_t *scan)
 			
 					node->stat = retval < 0 ? MB_SCAN_FAIL : MB_SCAN_SUCCESS;
 
-					//LOG_I("[%s] scan %s", node->alias_name, node->stat == MB_SCAN_SUCCESS ? "success" : "fail");
+					MBT_CORE_LOG_INFO("[%s] scan %s", node->alias_name, node->stat == MB_SCAN_SUCCESS ? "success" : "fail");
 				break;
 			
 			default:
@@ -196,7 +198,7 @@ int mds_scan(mds_scan_t *scan)
 		m_usleep(500000);
 	}
 	
-	return !anyOneOk;
+	return 0 - !anyOneOk;
 }
 
 
@@ -334,6 +336,8 @@ int mds_merge_result(mds_scan_t *scan, char **result)
 	
 	cJSON_Delete(res_merge);
 	
+
+	MBT_CORE_LOG_INFO("merge scan result success");
 	
 	return 0;
 }
