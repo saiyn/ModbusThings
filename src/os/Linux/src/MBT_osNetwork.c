@@ -1,28 +1,40 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <string.h>
+
+#include "MBT_os.h"
 
 #include "MBT_config.h"
 #include "MBT_osNetwork.h"
 #include "MBT_osMemory.h"
 
-#include <stdio.h>
+#include "MBT_osLog.h"
 
 static int get_net_state(void)
 {
-    struct addrinfo hints;
-    struct addrinfo *result;
+    struct addrinfo hints = {0};
+    struct addrinfo *result = NULL;
 
-    memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
     hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
     hints.ai_flags = 0;
     hints.ai_protocol = 0;          /* Any protocol */
 
-    int rc = getaddrinfo(DEFAULT_SERVER_FQDN, "8080", &hints, &result);
+    int rc = getaddrinfo(DEFAULT_SERVER_FQDN, NULL, &hints, &result);
 
-    printf("getaddrinfo:%d\n", rc);
+    if(rc == 0){
+
+        if(result->ai_addrlen == sizeof(struct sockaddr_in)){
+
+            char buf[INET_ADDRSTRLEN] = {0};
+
+            inet_ntop(AF_INET, &((struct sockaddr_in *)(result->ai_addr))->sin_addr, buf, sizeof(buf));
+
+            MBT_OS_LOG_INFO("get server ip:%s", buf);
+
+            freeaddrinfo(result);
+        }
+
+    }else{
+        MBT_OS_LOG_INFO("get addr info of server fail:%s", gai_strerror(rc));
+    }
 
     if(rc == EAI_AGAIN){
         return MDB_NETWORK_OFFLINE;

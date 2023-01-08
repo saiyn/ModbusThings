@@ -20,7 +20,7 @@ extern "C"{
 #include <stdarg.h>
 #include <stdbool.h>
 
-
+#include <arpa/inet.h>
 
 
 //#if defined(_TD_LINUX_64) || defined(_TD_LINUX_32) || defined(_TD_MIPS_64)  || defined(_TD_ARM_32) || defined(_TD_ARM_64)  || defined(_TD_DARWIN_64)
@@ -34,7 +34,8 @@ extern "C"{
 #include <inttypes.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
-
+#include <sys/socket.h>
+#include <netdb.h>
 
 #if defined(_TD_DARWIN_64)
     #include <dispatch/dispatch.h>

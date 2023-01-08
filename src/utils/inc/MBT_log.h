@@ -22,6 +22,7 @@ extern "C"{
 
 extern int32_t uDebugFlag;
 extern int32_t coreDebugFlag;
+extern int32_t portDebugFlag;
 
 
 #define MBT_LOG_INFO(...) do{                                              \

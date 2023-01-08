@@ -59,6 +59,14 @@ typedef struct mda_core{
 static mda_core_t _mc;
 
 
+static int mdc_global_init()
+{
+
+	httpclient_init();
+
+	return 0;
+}
+
 
 static int mdc_network_setup(mda_core_t *mc)
 {
@@ -444,6 +452,8 @@ static void mdc_start(mda_core_t *mdc)
 }
 
 int modbus_core_start(void){
+
+	mdc_global_init();
 	
 	mdc_network_setup(&_mc);
 

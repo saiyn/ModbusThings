@@ -5,6 +5,17 @@
 #include "MBT_portHttpClient.h"
 #include "MBT_osMemory.h"
 
+#include "MBT_portLog.h"
+
+
+int httpclient_init()
+{
+
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    return 0;
+}
+
 
 int httpclient_request_header_add(void **request_header, const char *fmt, ...)
 {
@@ -42,6 +53,9 @@ int httpclient_request(const char *URI, const void *header, const char *post_dat
     struct curl_slist *shead = (struct curl_slist *)header;
     CURL* curl = curl_easy_init();
     if(!curl){
+
+        MBT_PORT_LOG_ERROR("CURL", "curl init failed");
+
         return CURLE_FAILED_INIT;
     }
 
@@ -54,6 +68,10 @@ int httpclient_request(const char *URI, const void *header, const char *post_dat
 
     curl_easy_setopt(curl, CURLOPT_URL, URI);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, shead);
+
+#if defined(HTTP_QUERY_VERBOSE)
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+#endif
 
 
     if(post_data){
@@ -75,9 +93,18 @@ int httpclient_request(const char *URI, const void *header, const char *post_dat
         curl_slist_free_all(shead);
     }
 
+    MBT_PORT_LOG_DEBUG("CURL", "api:%s return code:%ld", URI,code);
 
-    *response = recv_str;
+    if(code == 200UL){
+        *response = recv_str;
+    }else{
 
+        MBT_PORT_LOG_ERROR("CURL", "api:%s error:%s", URI, recv_str);
+
+        rc = -1;
+    }
+
+    
     curl_easy_cleanup(curl);
 
     return rc;

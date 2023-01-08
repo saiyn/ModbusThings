@@ -60,6 +60,8 @@ int32_t uDebugFlag = (DEBUG_FILE) | (DEBUG_INFO) | (DEBUG_FATAL) | (DEBUG_SCREEN
 
 int32_t coreDebugFlag = (DEBUG_FILE) | (DEBUG_INFO) | (DEBUG_FATAL) | (DEBUG_SCREEN);
 
+int32_t portDebugFlag = (DEBUG_FILE) | (DEBUG_DEBUG) |(DEBUG_INFO) | (DEBUG_FATAL) | (DEBUG_SCREEN);
+
 
 static SLogBuff *logBuffNew(int32_t bufSize) {
   SLogBuff *tLogBuff = NULL;

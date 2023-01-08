@@ -86,6 +86,8 @@ int modbus_attributes_init(struct mdb_network *mdbn)
 	int rc =  mba_load_attribute(ATTRI_DEV_TOKEN, &token, NULL);
 	if(rc == 0){			
 		
+			MBT_CORE_LOG_INFO("load device token: %s successfully", token);
+
 			rc = mba_load_attribute(ATTRI_DEV_CONFIG, &config, NULL);
 			if(rc == 0){
 				
@@ -104,6 +106,8 @@ int modbus_attributes_init(struct mdb_network *mdbn)
 				timeout = 0;
 			}		
 	}else{
+
+		MBT_CORE_LOG_INFO("no token yet, the device need to do provisioning");
 		//we will wait forever in this if the network is not ready,
 		//because, without token means we have no config, without config, we can't do anything
 		char *server_uri = DEFAULT_SERVER_FQDN;

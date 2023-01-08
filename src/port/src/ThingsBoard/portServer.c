@@ -10,6 +10,7 @@
 #include "MBT_osMemory.h"
 #include "MBT_portHttpClient.h"
 
+#include "MBT_portLog.h"
 
 
 #define GENE_PROVISION_REQUEST(data, off, name, key, sec) do{				\
@@ -59,9 +60,16 @@ int service_dev_provision(char **token, char *server_uri, char *devid)
 	char devName[64] = {0};
 	char post_data[256] = {0};
 	
-	
+#if defined(SERVER_SPECIAL_PORT)
+
+	int rc = snprintf(req_uri, sizeof(req_uri), "%s:%d%s", server_uri, SERVER_SPECIAL_PORT, DEV_PROVISION_API);
+
+#else
 
 	int rc = snprintf(req_uri, sizeof(req_uri), "%s%s", server_uri, DEV_PROVISION_API);
+
+#endif
+
 	if(rc >= sizeof(req_uri)){
 		//we just throw error
 		return -1;
@@ -75,12 +83,17 @@ int service_dev_provision(char **token, char *server_uri, char *devid)
 	
 	GENE_PROVISION_REQUEST(post_data, index, devName,TB_PROVISION_DEVICE_KEY, TB_PROVISION_DEVICE_SEC);
 	
+	MBT_PORT_LOG_DEBUG("TB", "post data:<%s>", post_data);
+
 	
 	httpclient_request_header_add((void **)&header, "Content-Length: %d\r\n", strlen(post_data));
     httpclient_request_header_add((void **)&header, "Content-Type: application/json\r\n");
 	
 	if (httpclient_request(req_uri, (const char *)header, post_data, (unsigned char **)&request) < 0)
 	{
+
+			MBT_PORT_LOG_ERROR("TB", "device provisioning fail");
+
 			httpclient_free(header);
 			return -1;
 	}

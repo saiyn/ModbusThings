@@ -4,6 +4,9 @@
 //realtime service
 #define REALTIME_SUBTOPIC_MAX_NUM   (3)
 #define DEFAULT_SERVER_FQDN         "www.tqautotech.com"
+
+#define SERVER_SPECIAL_PORT         (8080)
+
 #define DEFAULT_DEV_UUID            "ModbusThings-000001"
 #define DEFAULT_BULK_SERVICE_API    ""
 #define REALTIME_ATTR_SUBTOPIC           "v1/devices/me/attributes"
@@ -70,7 +73,7 @@
 #define LOG_MAX_WAIT_MSEC 1000
 #define MBT_LOG_DIR "/var/log/mbt"
 
-
+#define HTTP_QUERY_VERBOSE
 
 
 

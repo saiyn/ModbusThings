@@ -11,15 +11,22 @@ extern "C"{
 #include "MBT_log.h"
 
 
+#define MBT_PORT_LOG_DEBUG(m, ...) do{                                      \
+    if(portDebugFlag & (DEBUG_DEBUG)){                                      \
+        MBT_printLog(m" DEBUG: ", coreDebugFlag, __VA_ARGS__);              \
+    }                                                                       \
+}while(0)
+
+
 #define MBT_PORT_LOG_INFO(m, ...) do{                                      \
-    if(coreDebugFlag & (DEBUG_INFO)){                                      \
+    if(portDebugFlag & (DEBUG_INFO)){                                      \
         MBT_printLog(m" INFO: ", coreDebugFlag, __VA_ARGS__);              \
     }                                                                      \
 }while(0)
 
 
 #define MBT_PORT_LOG_ERROR(m, ...) do{                                      \
-    if(coreDebugFlag & (DEBUG_ERROR)){                                      \
+    if(portDebugFlag & (DEBUG_ERROR)){                                      \
         MBT_printLog(m" ERROR: ", coreDebugFlag, __VA_ARGS__);              \
     }                                                                       \
 }while(0)

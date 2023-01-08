@@ -2,6 +2,10 @@
 #define _MBT_PORT_HTTP_CLIENT_H_
 
 
+int httpclient_init();
+
+
+
 int httpclient_request(const char *URI, const void *header, const char *post_data, unsigned char **response);
 
 
